@@ -222,6 +222,18 @@ h3 {
   gap: 10px;
 }
 
+.warning-state {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #e6c98f;
+  border-radius: 8px;
+  background: #fff7e3;
+  color: #75500d;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .slot-card {
   display: grid;
   grid-template-columns: 160px minmax(0, 1fr) auto;

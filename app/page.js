@@ -31,9 +31,11 @@ const isoDateFromOffset = (offsetDays) => {
 const getBookableDates = () => Array.from({ length: 9 }, (_, index) => isoDateFromOffset(index));
 
 export default function HomePage() {
-  const [availability, setAvailability] = useState({ sources: [], slots: [], generatedAt: null, loading: true });
+  const [availability, setAvailability] = useState({ sources: [], slots: [], generatedAt: null, loading: false });
   const [bookableDates, setBookableDates] = useState([]);
   const [facilityOptions, setFacilityOptions] = useState([]);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [searchRequestId, setSearchRequestId] = useState(0);
   const [draftFilters, setDraftFilters] = useState({
     date: "",
     neighborhood: "all",
@@ -51,7 +53,6 @@ export default function HomePage() {
     const dates = getBookableDates();
     setBookableDates(dates);
     setDraftFilters((current) => ({ ...current, date: current.date || dates[0] }));
-    setAppliedFilters((current) => ({ ...current, date: current.date || dates[0] }));
   }, []);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    if (!appliedFilters.date) return;
+    if (!hasSearched || !appliedFilters.date) return;
 
     const controller = new AbortController();
     setAvailability((current) => ({ ...current, loading: true }));
@@ -82,7 +83,7 @@ export default function HomePage() {
       });
 
     return () => controller.abort();
-  }, [appliedFilters.date, appliedFilters.neighborhood]);
+  }, [appliedFilters.date, appliedFilters.neighborhood, hasSearched, searchRequestId]);
 
   const neighborhoods = useMemo(() => {
     const known = facilityOptions.map((facility) => facility.neighborhood);
@@ -100,7 +101,11 @@ export default function HomePage() {
 
   const nextSlot = filteredSlots[0];
   const hasPendingChanges = JSON.stringify(draftFilters) !== JSON.stringify(appliedFilters);
-  const applyFilters = () => setAppliedFilters(draftFilters);
+  const applyFilters = () => {
+    setAppliedFilters({ ...draftFilters });
+    setHasSearched(true);
+    setSearchRequestId((current) => current + 1);
+  };
 
   return (
     <main className="app-shell">
@@ -112,7 +117,7 @@ export default function HomePage() {
         <div className="status-strip">
           <span>{availability.sources.length} sources</span>
           <span>{filteredSlots.length} openings</span>
-          <span>{availability.loading ? "Loading" : "Updated just now"}</span>
+          <span>{availability.loading ? "Loading" : hasSearched ? "Updated just now" : "Ready"}</span>
         </div>
       </section>
 
@@ -173,7 +178,7 @@ export default function HomePage() {
           </label>
 
           <button className="search-button" type="button" onClick={applyFilters} disabled={availability.loading}>
-            {availability.loading ? "Searching" : hasPendingChanges ? "Search" : "Refresh"}
+            {availability.loading ? "Searching" : hasPendingChanges || !hasSearched ? "Search" : "Refresh"}
           </button>
         </aside>
 
@@ -181,7 +186,15 @@ export default function HomePage() {
           <div className="summary-panel">
             <div>
               <p className="eyebrow">Best next option</p>
-              <h2>{availability.loading ? "Checking WebTrac" : nextSlot ? nextSlot.venue : "No matching courts"}</h2>
+              <h2>
+                {availability.loading
+                  ? "Checking courts"
+                  : nextSlot
+                    ? nextSlot.venue
+                    : hasSearched
+                      ? "No matching courts"
+                      : "Ready when you are"}
+              </h2>
             </div>
             {nextSlot && !availability.loading ? (
               <a className="primary-action" href={nextSlot.bookingUrl} target="_blank" rel="noreferrer">
@@ -191,6 +204,13 @@ export default function HomePage() {
           </div>
 
           <div className="slot-list">
+            {!availability.loading && availability.warnings?.length ? (
+              <div className="warning-state">
+                {availability.warnings.map((warning) => (
+                  <span key={warning}>{warning}</span>
+                ))}
+              </div>
+            ) : null}
             {!availability.loading &&
               filteredSlots.map((slot) => (
               <article className="slot-card" key={slot.id}>
@@ -223,7 +243,12 @@ export default function HomePage() {
                 Checking LA Parks WebTrac for {appliedFilters.date ? displayDate(appliedFilters.date) : "the selected date"}.
               </div>
             ) : null}
-            {!availability.loading && !filteredSlots.length ? (
+            {!availability.loading && !hasSearched ? (
+              <div className="empty-state">
+                Pick a date and area, then hit Search.
+              </div>
+            ) : null}
+            {!availability.loading && hasSearched && !filteredSlots.length ? (
               <div className="empty-state">
                 No courts match those filters. Try widening the time or area.
               </div>

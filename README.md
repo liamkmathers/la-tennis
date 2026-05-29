@@ -6,9 +6,20 @@ Prototype for aggregating Los Angeles tennis court availability into one manual-
 
 - Next.js app at `/`
 - Availability API at `/api/availability`
-- Sample providers and court slots in `lib/availability.js`
+- Live LA Parks WebTrac provider for Cheviot Hills and Westwood
+- Opt-in TriFit Santa Monica provider through MyiClub credentials
 - Filters for date, area, start time, and lights
 - Manual booking links for each result
+
+## Private provider setup
+
+TriFit/MyiClub requires a member login. Keep credentials out of source control and pass them through environment variables when starting the dev server:
+
+```sh
+TRIFIT_USERNAME="your-username" TRIFIT_PASSWORD="your-password" npm run dev
+```
+
+Without those variables, the app still searches the public LA Parks sources and shows a warning for TriFit.
 
 ## Adapter contract
 
@@ -40,4 +51,3 @@ Replace the sample slots in `lib/availability.js` with provider adapters. The fi
 1. Public JSON/API calls already used by the site
 2. Static HTML parsing
 3. Browser automation for login-heavy or JavaScript-heavy booking pages
-
