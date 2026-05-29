@@ -7,7 +7,7 @@ Prototype for aggregating Los Angeles tennis court availability into one manual-
 - Next.js app at `/`
 - Availability API at `/api/availability`
 - Live LA Parks WebTrac provider for Cheviot Hills and Westwood
-- Opt-in TriFit Santa Monica provider through MyiClub credentials
+- Opt-in Colorado Park provider through MyiClub credentials
 - Filters for date, area, start time, and lights
 - Manual booking links for each result
 

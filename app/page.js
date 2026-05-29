@@ -138,14 +138,14 @@ export default function HomePage() {
           </label>
 
           <label>
-            Area
+            Court
             <select
               value={draftFilters.neighborhood}
               onChange={(event) =>
                 setDraftFilters((current) => ({ ...current, neighborhood: event.target.value }))
               }
             >
-              <option value="all">All areas</option>
+              <option value="all">All courts</option>
               {neighborhoods.map((neighborhood) => (
                 <option key={neighborhood} value={neighborhood}>
                   {neighborhood}
