@@ -240,7 +240,7 @@ export default function HomePage() {
             ))}
             {availability.loading ? (
               <div className="empty-state">
-                Checking LA Parks WebTrac for {appliedFilters.date ? displayDate(appliedFilters.date) : "the selected date"}.
+                Checking court systems for {appliedFilters.date ? displayDate(appliedFilters.date) : "the selected date"}.
               </div>
             ) : null}
             {!availability.loading && !hasSearched ? (
