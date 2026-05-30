@@ -39,14 +39,12 @@ export default function HomePage() {
   const [draftFilters, setDraftFilters] = useState({
     date: "",
     neighborhood: "all",
-    after: "all",
-    lights: false
+    after: "all"
   });
   const [appliedFilters, setAppliedFilters] = useState({
     date: "",
     neighborhood: "all",
-    after: "all",
-    lights: false
+    after: "all"
   });
 
   useEffect(() => {
@@ -94,7 +92,6 @@ export default function HomePage() {
   const filteredSlots = useMemo(() => {
     return availability.slots.filter((slot) => {
       if (appliedFilters.after !== "all" && timeToMinutes(slot.startTime) < Number(appliedFilters.after)) return false;
-      if (appliedFilters.lights && !slot.lights) return false;
       return true;
     });
   }, [availability.slots, appliedFilters]);
@@ -112,7 +109,7 @@ export default function HomePage() {
       <section className="topbar">
         <div>
           <p className="eyebrow">LA tennis availability</p>
-          <h1>Court openings, pulled into one place.</h1>
+          <h1>Court openings.</h1>
         </div>
         <div className="status-strip">
           <span>{availability.sources.length} sources</span>
@@ -166,15 +163,6 @@ export default function HomePage() {
               <option value="1020">5:00 PM</option>
               <option value="1140">7:00 PM</option>
             </select>
-          </label>
-
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={draftFilters.lights}
-              onChange={(event) => setDraftFilters((current) => ({ ...current, lights: event.target.checked }))}
-            />
-            Lights available
           </label>
 
           <button className="search-button" type="button" onClick={applyFilters} disabled={availability.loading}>
